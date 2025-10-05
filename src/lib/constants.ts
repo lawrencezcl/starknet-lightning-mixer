@@ -60,7 +60,7 @@ export const SUPPORTED_TOKENS = {
 
 // API endpoints
 export const API_ENDPOINTS = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://38.14.254.46:3002',
   MIXING: {
     DEPOSIT: '/api/mix/deposit',
     STATUS: (transactionId: string) => `/api/mix/status/${transactionId}`,
@@ -85,7 +85,7 @@ export const API_ENDPOINTS = {
 
 // WebSocket configuration
 export const WS_CONFIG = {
-  URL: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001',
+  URL: process.env.NEXT_PUBLIC_WS_URL || 'ws://38.14.254.46:3002',
   RECONNECT_ATTEMPTS: 5,
   RECONNECT_DELAY: 1000,
   PING_INTERVAL: 30000,

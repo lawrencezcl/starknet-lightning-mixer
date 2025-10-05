@@ -5,7 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { WalletConnect } from "@/components/common/WalletConnect";
+import { WalletConnectWrapper } from "@/components/common/WalletConnectWrapper";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -23,7 +23,11 @@ export const metadata: Metadata = {
   description: "Privacy-enhanced token mixing on Starknet using Lightning Network and Cashu e-cash",
   keywords: "Starknet, Privacy, Mixer, Lightning, Cashu, DeFi",
   authors: [{ name: "Starknet Lightning Mixer Team" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -40,7 +44,7 @@ export default function RootLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
-          <WalletConnect open={false} onOpenChange={() => {}} />
+          <WalletConnectWrapper />
           <Toaster />
         </div>
       </body>

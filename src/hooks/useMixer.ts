@@ -4,7 +4,7 @@ import { useMixerStore } from '@/store/mixerStore';
 import { Transaction, PrivacySettings, LightningInvoiceRequest, DepositParams } from '@/types/mixer';
 import { toast } from 'sonner';
 import { generateId } from '@/lib/utils';
-import { API_ENDPOINTS } from '@/lib/constants';
+import { API_ENDPOINTS, WS_CONFIG } from '@/lib/constants';
 
 // Mock WebSocket connection for real-time updates
 class WebSocketManager {
@@ -16,7 +16,7 @@ class WebSocketManager {
 
   connect() {
     try {
-      this.ws = new WebSocket(API_ENDPOINTS.WS_URL);
+      this.ws = new WebSocket(WS_CONFIG.URL);
 
       this.ws.onopen = () => {
         console.log('WebSocket connected');
@@ -99,9 +99,12 @@ class WebSocketManager {
 // Global WebSocket manager
 const wsManager = new WebSocketManager();
 
-// Connect WebSocket when module loads
+// Connect WebSocket when module loads (client-side only)
 if (typeof window !== 'undefined') {
-  wsManager.connect();
+  // Add a small delay to ensure component mounting
+  setTimeout(() => {
+    wsManager.connect();
+  }, 100);
 }
 
 export function useMixer() {
@@ -113,6 +116,7 @@ export function useMixer() {
     setProcessing,
     transactions,
     privacySettings,
+    currentTransaction,
   } = useMixerStore();
 
   const [error, setError] = useState<string | null>(null);
@@ -141,7 +145,7 @@ export function useMixer() {
     params: LightningInvoiceRequest
   ): Promise<string> => {
     try {
-      const response = await fetch(`${API_ENDPOINTS.LIGHTNING.INVOICE}`, {
+      const response = await fetch(`${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.LIGHTNING.INVOICE}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
@@ -273,7 +277,7 @@ export function useMixer() {
   ) => {
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.MIXING.HISTORY}?userAddress=${address}&limit=${limit}&offset=${offset}`
+        `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.MIXING.HISTORY}?userAddress=${address}&limit=${limit}&offset=${offset}`
       );
 
       if (!response.ok) {
@@ -290,7 +294,7 @@ export function useMixer() {
   // Cancel transaction
   const cancelTransaction = useCallback(async (transactionId: string) => {
     try {
-      const response = await fetch(`${API_ENDPOINTS.MIXING.CANCEL}/${transactionId}`, {
+      const response = await fetch(`${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.MIXING.CANCEL}/${transactionId}`, {
         method: 'POST',
       });
 
@@ -315,9 +319,9 @@ export function useMixer() {
     deposit,
     isProcessing: useMixerStore(state => state.isProcessing) || mockContractWrite.isPending,
     error,
-    currentTransaction: useMixerStore(state => state.currentTransaction),
-    transactions: useMixerStore(state => state.transactions),
-    privacySettings: useMixerStore(state => state.privacySettings),
+    currentTransaction,
+    transactions,
+    privacySettings,
     getTransactionHistory,
     cancelTransaction,
     transactionReceipt: waitForTransaction.data,
